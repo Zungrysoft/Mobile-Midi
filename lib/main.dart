@@ -1,75 +1,119 @@
-import 'dart:io';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:sensors/sensors.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mobile MIDI',
       theme: ThemeData(
+
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Mobile MIDI'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  File _image;
-  final picker = ImagePicker();
-  String _value = "Try taking a photo";
+  double x, y, z;
 
-  Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-      _value = "Nice photo!";
+  @override
+  void initState() {
+    super.initState();
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      setState(() {
+        x = event.x;
+        y = event.y;
+        z = event.z;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _image == null
-                ? Text('No image selected.')
-                : Image.file(_image),
-            Text(
-              '$_value',
-            ),
-            ElevatedButton(
-              onPressed: getImage,
-              child: Icon(Icons.camera),
-            ),
-          ],
+        appBar: AppBar(
+          title: Text("Mobile MIDI"),
         ),
-      ),
-    );
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  "Current Gyro Positions:",
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w900),
+                ),
+              ),
+              Table(
+                border: TableBorder.all(
+                    width: 2.0,
+                    color: Colors.blueAccent,
+                    style: BorderStyle.solid),
+                children: [
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "X Axis : ",
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(x.toStringAsFixed(2),
+                            style: TextStyle(fontSize: 20.0)),
+                      )
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Y Axis : ",
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(y.toStringAsFixed(2),
+                            style: TextStyle(fontSize: 20.0)),
+                      )
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Z Axis : ",
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(z.toStringAsFixed(2),
+                            style: TextStyle(fontSize: 20.0)),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ));
   }
 }
