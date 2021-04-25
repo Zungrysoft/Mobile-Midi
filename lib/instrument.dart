@@ -8,10 +8,13 @@ class InstrumentPage extends StatefulWidget {
 }
 
 class _InstrumentPageState extends State<InstrumentPage> {
-  double x = 0;
-  double y = 0;
-  double z = 0;
-  Stream<dynamic> accel;
+  double accel_x = 0;
+  double accel_y = 0;
+  double accel_z = 0;
+  double gyro_x = 0;
+  double gyro_y = 0;
+  double gyro_z = 0;
+  //Stream<dynamic> accel;
 
   @override
   void initState() {
@@ -19,9 +22,18 @@ class _InstrumentPageState extends State<InstrumentPage> {
     accelerometerEvents.listen((AccelerometerEvent event) {
       if (mounted) {
         setState(() {
-          x = event.x;
-          y = event.y;
-          z = event.z;
+          accel_x = event.x;
+          accel_y = event.y;
+          accel_z = event.z;
+        });
+      }
+    });
+    gyroscopeEvents.listen((GyroscopeEvent event) {
+      if (mounted) {
+        setState(() {
+          gyro_x = event.x;
+          gyro_y = event.y;
+          gyro_z = event.z;
         });
       }
     });
@@ -37,6 +49,12 @@ class _InstrumentPageState extends State<InstrumentPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              ElevatedButton(
+                child: Text('Settings'),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/settings');
+                },
+              ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
@@ -61,7 +79,7 @@ class _InstrumentPageState extends State<InstrumentPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(x.toStringAsFixed(2),
+                        child: Text(gyro_x.toStringAsFixed(2),
                             style: TextStyle(fontSize: 20.0)),
                       )
                     ],
@@ -77,7 +95,7 @@ class _InstrumentPageState extends State<InstrumentPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(y.toStringAsFixed(2),
+                        child: Text(gyro_y.toStringAsFixed(2),
                             style: TextStyle(fontSize: 20.0)),
                       )
                     ],
@@ -93,7 +111,7 @@ class _InstrumentPageState extends State<InstrumentPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(z.toStringAsFixed(2),
+                        child: Text(gyro_z.toStringAsFixed(2),
                             style: TextStyle(fontSize: 20.0)),
                       )
                     ],

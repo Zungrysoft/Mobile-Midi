@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'global_state.dart';
 
-class HomePage extends StatefulWidget {
+class InfoPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _InfoPageState createState() => _InfoPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _InfoPageState extends State<InfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Main Menu'),
+        title: Text('Info'),
         backgroundColor: Colors.green,
       ),
       body: Center(
           child: Column(
             children: <Widget>[
-              ElevatedButton(
-                child: Text('Play Instrument'),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/instrument');
-                },
+              Text(
+                '' + GlobalState.infoText,
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w900),
               ),
             ],
           )),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'instrument.dart';
 import 'settings.dart';
+import 'info.dart';
+import 'global_state.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,7 +22,8 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder> {
         '/': (context) => HomePage(),
         '/instrument': (context) => InstrumentPage(),
-        //'/settings': (context) => SettingsPage(),
+        '/settings': (context) => SettingsPage(),
+        '/info': (context) => InfoPage(),
       },
     );
   }
