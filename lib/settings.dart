@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-import 'info.dart';
 import 'global_state.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -31,7 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     value: GlobalState.sensitivity,
                     min: 1,
                     max: 20,
-                    divisions: 20,
+                    divisions: 19,
                     label: GlobalState.sensitivity.round().toString(),
                     onChanged: (double value) {
                       setState(() {
@@ -80,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: <Widget>[
                   ToggleSwitch(
                     initialLabelIndex: GlobalState.glissandoEnable,
-                    labels: ['On', 'Off'],
+                    labels: ['Off', 'On'],
                     onToggle: (index) {
                       GlobalState.glissandoEnable = index;
                     },
@@ -117,6 +116,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
+              Text(
+                "Onboard Sound",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ToggleSwitch(
+                    initialLabelIndex: GlobalState.onboardSound,
+                    labels: ['Off', 'On'],
+                    onToggle: (index) {
+                      GlobalState.onboardSound = index;
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.info),
+                    onPressed: () {
+                      GlobalState.infoText = descOnboardSound;
+                      Navigator.pushNamed(context, '/info');
+                    },
+                  ),
+                ],
+              ),
             ],
           )),
     );
@@ -126,5 +148,6 @@ class _SettingsPageState extends State<SettingsPage> {
   String descSensitivity = "Lower sensitivity means you will need to tilt the device more to change notes.";
   String descGlissandoEnable = "If enabled, the top section of the tap box will be devoted to glissandos. Notes held in the glissando box will change when you tilt the device, as opposed to being held.";
   String descGlissandoRestrict = "Decides what notes glissandos will be restricted to.\n\nAll: Will play any note.\n\nWhite: Only plays white notes.\n\nBlack: Only plays black notes.";
+  String descOnboardSound = "If enabled, uses simple onboard sound samples instead of a MIDI connection.";
 
 }
