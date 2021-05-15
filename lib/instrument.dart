@@ -48,32 +48,6 @@ class DrumPadWidget extends StatefulWidget {
 class _DrumPadWidgetState extends State<DrumPadWidget> {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
   StreamSubscription<String> _setupSubscription;
-  //MidiCommand _midiCommand = MidiCommand();
-
-
-
-  /*@override
-  void initState() {
-    super.initState();
-
-    _midiCommand.startScanningForBluetoothDevices().catchError((err) {
-      print("Error $err");
-    });
-    _setupSubscription = _midiCommand.onMidiSetupChanged.listen((data) {
-      print("setup changed $data");
-
-      switch (data) {
-        case "deviceFound":
-          setState(() {});
-          break;
-      // case "deviceOpened":
-      //   break;
-        default:
-        // print("Unhandled setup change: $data");
-          break;
-      }
-    });
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -209,15 +183,17 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
           }*/
 
           //Handle the animation
-          //textEd.text = globalPos.toString();
-          noteWheelCon.jumpTo(globalPos);
-          /*DateTime now = DateTime.now();
-          noteWheelCon.animateTo(
+          if (GlobalState.interpolateNoteWheel == 1) {
+            DateTime now = DateTime.now();
+            noteWheelCon.animateTo(
               globalPos,
               curve: Curves.linear,
               duration: now.difference(prev),
-          );
-          prev = now;*/
+            );
+            prev = now;
+          } else {
+            noteWheelCon.jumpTo(globalPos);
+          }
       }
     });
   }

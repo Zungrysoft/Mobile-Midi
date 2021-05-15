@@ -1,4 +1,4 @@
-package com.example.hello_world_calvin
+package com.example.mobile_midi
 
 import io.flutter.embedding.android.FlutterActivity
 

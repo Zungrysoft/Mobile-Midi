@@ -4,5 +4,6 @@ class GlobalState {
   static int noteMode = 0;
   static int glissandoEnable = 0;
   static int glissandoRestrict = 0;
-  static int onboardSound = 1;
+  static int onboardSound = 0;
+  static int interpolateNoteWheel = 0;
 }
