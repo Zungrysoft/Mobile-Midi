@@ -4,6 +4,7 @@ import 'package:mobile_midi/global_state.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:async';
 import 'notes.dart';
+import 'package:vibration/vibration.dart';
 
 class InstrumentPage extends StatefulWidget {
   @override
@@ -187,8 +188,13 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
 
           //Glissando
           int curNote = selNote();
-          if (curNote != prevNote && glissando) {
-            noteGlissando(curNote);
+          if (curNote != prevNote) {
+            if (GlobalState.vibrationEnable == 1) {
+              Vibration.vibrate(duration: 30,amplitude: 10);
+            }
+            if (glissando) {
+              noteGlissando(curNote);
+            }
           }
           prevNote = curNote;
 
@@ -284,6 +290,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
     }
   }
   void noteGlissando(int n) {
+    print("GLISSANDO");
     //Clear all existing notes
     for (int i = 0; i < heldNotes.length; i ++) {
       int stop = heldNotes[i];

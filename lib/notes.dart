@@ -49,13 +49,21 @@ class Notes {
     if (!usbInititalized) {
       usbInit();
     }
-    NoteOnMessage(channel:0,note:sentNote,velocity:127).send();
+    NoteOnMessage(
+        channel:GlobalState.midiChannel,
+        note:sentNote,
+        velocity:GlobalState.noteVelocity,
+    ).send();
   }
   static void sendMIDINoteOff(int sentNote) async {
     if (!usbInititalized) {
       usbInit();
     }
-    NoteOffMessage(channel:0,note:sentNote,velocity:127).send();
+    NoteOffMessage(
+        channel:GlobalState.midiChannel,
+        note:sentNote,
+        velocity:0,
+    ).send();
   }
   static void noteOn(int note){
     if (GlobalState.onboardSound == 1) {
