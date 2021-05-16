@@ -57,7 +57,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: <Widget>[
                   ToggleSwitch(
                     initialLabelIndex: GlobalState.noteMode,
-                    labels: ['Legato', 'Chord'],
+                    fontSize: 10,
+                    labels: ['Legato', 'Chord', 'Auto-Chord'],
                     onToggle: (index) {
                       GlobalState.noteMode = index;
                     },
@@ -66,6 +67,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     icon: const Icon(Icons.info),
                     onPressed: () {
                       GlobalState.infoText = descNoteMode;
+                      Navigator.pushNamed(context, '/info');
+                    },
+                  ),
+                ],
+              ),
+              Text(
+                "Auto-Chord Selection",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ToggleSwitch(
+                    initialLabelIndex: GlobalState.autoChord,
+                    labels: ['Maj','Min','Pow','Oct'],
+                    onToggle: (index) {
+                      GlobalState.autoChord = index;
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.info),
+                    onPressed: () {
+                      GlobalState.infoText = descAutoChord;
                       Navigator.pushNamed(context, '/info');
                     },
                   ),
@@ -176,13 +200,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       Notes.usbInit();
                     },
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.info),
-                    onPressed: () {
-                      GlobalState.infoText = GlobalState.debugText;
-                      Navigator.pushNamed(context, '/info');
-                    },
-                  ),
                 ],
               ),
             ],
@@ -190,7 +207,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
   //All of this stuff is for the info menu that explains each setting
-  String descNoteMode = "This setting decides what happens when you tap a new note while already holding a note with your other thumb.\n\nLegato: Switches to the new note.\n\nChord: Both notes will play together.";
+  String descNoteMode = "This setting decides what happens when you tap a new note while already holding a note with your other thumb.\n\nLegato: Switches to the new note.\n\nChord: Both notes will play together.\n\nAuto-Chord: Like Legato, but it play the selected chord instead.";
+  String descAutoChord = "If you have Auto-Chord selected, this setting determines which chord is played.";
   String descSensitivity = "Lower sensitivity means you will need to tilt the device more to change notes.";
   String descGlissandoEnable = "If enabled, the top section of the tap box will be devoted to glissandos. Notes held in the glissando box will change when you tilt the device, as opposed to being held.";
   String descGlissandoRestrict = "Decides what notes glissandos will be restricted to.\n\nAll: Will play any note.\n\nWhite: Only plays white notes.\n\nBlack: Only plays black notes.";

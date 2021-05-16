@@ -200,17 +200,41 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
     fingers ++;
     print("PRESSED");
     //Legato Mode
-    if (GlobalState.noteMode == 0) {
-      //Turn off the previous note
-      if (heldNotes.length > 0) {
-        int stop = heldNotes[0];
+    if (GlobalState.noteMode == 0 || GlobalState.noteMode == 2) {
+      //Turn off all previous notes
+      for (int i = 0; i < heldNotes.length; i ++) {
+        int stop = heldNotes[i];
         Notes.noteOff(stop);
-        heldNotes.clear();
       }
+      heldNotes.clear();
 
       //Turn on the new note
       Notes.noteOn(n);
       heldNotes.add(n);
+      if (GlobalState.noteMode == 2) {
+        if (GlobalState.autoChord == 0) {
+          Notes.noteOn(n+4);
+          heldNotes.add(n+4);
+          Notes.noteOn(n+7);
+          heldNotes.add(n+7);
+        }
+        else if (GlobalState.autoChord == 1) {
+          Notes.noteOn(n+3);
+          heldNotes.add(n+3);
+          Notes.noteOn(n+7);
+          heldNotes.add(n+7);
+        }
+        else if (GlobalState.autoChord == 2) {
+          Notes.noteOn(n+7);
+          heldNotes.add(n+7);
+          Notes.noteOn(n+12);
+          heldNotes.add(n+12);
+        }
+        else if (GlobalState.autoChord == 3) {
+          Notes.noteOn(n+12);
+          heldNotes.add(n+12);
+        }
+      }
     }
     //Chord Mode
     else {
@@ -223,11 +247,13 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
     print("RELEASED");
     fingers --;
     //Legato Mode
-    if (GlobalState.noteMode == 0) {
+    if (GlobalState.noteMode == 0 || GlobalState.noteMode == 2) {
       //If all fingers have been taken off, turn off all notes
-      if (fingers == 0 && heldNotes.length > 0) {
-        int stop = heldNotes[0];
-        Notes.noteOff(stop);
+      if (fingers == 0) {
+        for (int i = 0; i < heldNotes.length; i ++) {
+          int stop = heldNotes[i];
+          Notes.noteOff(stop);
+        }
         heldNotes.clear();
       }
     }
