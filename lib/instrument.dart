@@ -4,6 +4,7 @@ import 'package:mobile_midi/global_state.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:async';
 import 'notes.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 import 'package:vibration/vibration.dart';
 
 class InstrumentPage extends StatefulWidget {
@@ -12,39 +13,277 @@ class InstrumentPage extends StatefulWidget {
 }
 class _InstrumentPageState extends State<InstrumentPage> {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Timer timer;
+  int curMode = 0;
+
+  void checkUpdate() {
+    if (GlobalState.controlsMode != curMode) {
+      setState(() {
+        curMode = GlobalState.controlsMode;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) =>
+      checkUpdate()
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text("Mobile MIDI"),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              ElevatedButton(
-                child: Text('Settings'),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-              DrumPadWidget(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child:NoteWheelWidget(),
-              ),
-            ],
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text("Mobile MIDI"),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Notes.usbInit();
+            },
+            icon: Icon(CupertinoIcons.refresh_circled),
           ),
-        ));
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+            icon: Icon(CupertinoIcons.wrench_fill),
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
+              child:
+                GlobalState.controlsMode==0?
+                Controls1Widget():
+                GlobalState.controlsMode==1?
+                Controls2Widget():
+                Controls3Widget(),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child:NoteWheelWidget(),
+            ),
+          ],
+        ),
+      )
+    );
   }
   void dispose() {
     super.dispose();
   }
 }
 
+class Controls1Widget extends StatefulWidget {
+  @override
+  _Controls1WidgetState createState() => _Controls1WidgetState();
+}
+
+class _Controls1WidgetState extends State<Controls1Widget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Slider(
+          value: GlobalState.CC1.toDouble(),
+          min: 0,
+          max: 127,
+          divisions: 127,
+          label:  GlobalState.CC1.toString(),
+          onChanged: (double value) {
+            setState(() {
+              GlobalState.CC1 = value.toInt();
+              Notes.sendMIDICC(GlobalState.CC1Set,GlobalState.CC1);
+            });
+          },
+        ),
+        Slider(
+          value: GlobalState.CC2.toDouble(),
+          min: 0,
+          max: 127,
+          divisions: 127,
+          label:  GlobalState.CC2.toString(),
+          onChanged: (double value) {
+            setState(() {
+              GlobalState.CC2 = value.toInt();
+              Notes.sendMIDICC(GlobalState.CC2Set,GlobalState.CC2);
+            });
+          },
+        ),
+        Slider(
+          value: GlobalState.CC3.toDouble(),
+          min: 0,
+          max: 127,
+          divisions: 127,
+          label:  GlobalState.CC3.toString(),
+          onChanged: (double value) {
+            setState(() {
+              GlobalState.CC3 = value.toInt();
+              Notes.sendMIDICC(GlobalState.CC3Set,GlobalState.CC3);
+            });
+          },
+        ),
+        Slider(
+          value: GlobalState.CC4.toDouble(),
+          min: 0,
+          max: 127,
+          divisions: 127,
+          label:  GlobalState.CC4.toString(),
+          onChanged: (double value) {
+            setState(() {
+              GlobalState.CC4 = value.toInt();
+              Notes.sendMIDICC(GlobalState.CC4Set,GlobalState.CC4);
+            });
+          },
+        ),
+        Slider(
+          value: GlobalState.CC5.toDouble(),
+          min: 0,
+          max: 127,
+          divisions: 127,
+          label:  GlobalState.CC5.toString(),
+          onChanged: (double value) {
+            setState(() {
+              GlobalState.CC5 = value.toInt();
+              Notes.sendMIDICC(GlobalState.CC5Set,GlobalState.CC5);
+            });
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class Controls2Widget extends StatefulWidget {
+  @override
+  _Controls2WidgetState createState() => _Controls2WidgetState();
+}
+
+class _Controls2WidgetState extends State<Controls2Widget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            DrumPadWidget(0),
+            DrumPadWidget(1),
+            DrumPadWidget(2),
+            DrumPadWidget(3),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            DrumPadWidget(4),
+            DrumPadWidget(5),
+            DrumPadWidget(6),
+            DrumPadWidget(7),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            DrumPadWidget(8),
+            DrumPadWidget(9),
+            DrumPadWidget(10),
+            DrumPadWidget(11),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            DrumPadWidget(12),
+            DrumPadWidget(13),
+            DrumPadWidget(14),
+            DrumPadWidget(15),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class Controls3Widget extends StatefulWidget {
+  @override
+  _Controls3WidgetState createState() => _Controls3WidgetState();
+}
+
+class _Controls3WidgetState extends State<Controls3Widget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Text(
+          "Note Mode",
+          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ToggleSwitch(
+              initialLabelIndex: GlobalState.noteMode,
+              fontSize: 10,
+              labels: ['Legato', 'Chord', 'Auto-Chord'],
+              onToggle: (index) {
+                GlobalState.noteMode = index;
+              },
+            ),
+          ],
+        ),
+        Text(
+          "Auto-Chord Selection",
+          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ToggleSwitch(
+              initialLabelIndex: GlobalState.autoChord,
+              labels: ['Maj','Min','Pow','Oct'],
+              onToggle: (index) {
+                GlobalState.autoChord = index;
+              },
+            ),
+          ],
+        ),
+        Text(
+          "MIDI Note Velocity",
+          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Slider(
+              value: GlobalState.noteVelocity.toDouble(),
+              min: 1,
+              max: 127,
+              divisions: 125,
+              label: GlobalState.noteVelocity.round().toString(),
+              onChanged: (double value) {
+                setState(() {
+                  GlobalState.noteVelocity = value.toInt();
+                });
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class DrumPadWidget extends StatefulWidget {
+  final int _drumNote;
+  const DrumPadWidget(this._drumNote);
+
   @override
   _DrumPadWidgetState createState() => _DrumPadWidgetState();
 }
@@ -60,10 +299,10 @@ class _DrumPadWidgetState extends State<DrumPadWidget> {
       children: <Widget>[
         Listener(
           onPointerDown: (details) {
-            Notes.noteOn(80);
+            Notes.noteOn(widget._drumNote,isDrum:true);
           },
           onPointerUp: (details) {
-            Notes.noteOff(80);
+            Notes.noteOff(widget._drumNote,isDrum:true);
           },
           child: Container(
             decoration: BoxDecoration(color: Colors.orange, border: Border.all()),
@@ -110,6 +349,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
   bool glissando = false;
   int fingers = 0;
   int prevNote = 0;
+  var screenSize = 0;
 
   String noteText(int n) {
     String builtNote = "";
@@ -215,7 +455,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
   }
 
   int selNote() {
-    return globalPos~/noteWidth;
+    return (globalPos+(screenSize/2))~/noteWidth;
   }
 
   void notePressed(int n) {
@@ -268,6 +508,9 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
   void noteReleased(int n) {
     print("RELEASED");
     fingers --;
+    if (fingers < 0) {
+      fingers = 0;
+    }
     //Legato Mode
     if (GlobalState.noteMode == 0 || GlobalState.noteMode == 2) {
       //If all fingers have been taken off, turn off all notes
@@ -307,6 +550,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.of(context).size.width.toInt();
     buildNotesChromatic();
     return Column(
       children: <Widget>[
@@ -337,11 +581,27 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
                 steady = false;
               },
               child: Container(
-                width:MediaQuery.of(context).size.width/2,
+                width:MediaQuery.of(context).size.width*.375,
                 height:MediaQuery.of(context).size.height/10,
                 decoration: BoxDecoration(color: Colors.red, border: Border.all()),
                 padding: EdgeInsets.all(25),
                 child: Text('Steady'),
+              ),
+            ),
+            Listener(
+              onPointerDown: (details) {
+                fingers = 0;
+                heldNotes.clear();
+                for (int i = 0; i < 127; i ++) {
+                  Notes.sendMIDINoteOff(i);
+                }
+              },
+              child: Container(
+                width:MediaQuery.of(context).size.width*.25,
+                height:MediaQuery.of(context).size.height/10,
+                decoration: BoxDecoration(color: Colors.red[200], border: Border.all()),
+                padding: EdgeInsets.all(25),
+                child: Text('Panic'),
               ),
             ),
             Listener(
@@ -354,7 +614,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
                 noteGlissando(-1);
               },
               child: Container(
-                width:MediaQuery.of(context).size.width/2,
+                width:MediaQuery.of(context).size.width*.375,
                 height:MediaQuery.of(context).size.height/10,
                 decoration: BoxDecoration(color: Colors.orange, border: Border.all()),
                 padding: EdgeInsets.all(25),

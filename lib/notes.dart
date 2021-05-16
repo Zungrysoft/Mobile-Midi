@@ -45,36 +45,46 @@ class Notes {
     final deviceFuture = _midiCommand.devices;
     deviceFuture.then((value) => processDevices(value));
   }
-  static void sendMIDINoteOn(int sentNote) async {
+  static void sendMIDICC(int control, int val) async {
+    if (!usbInititalized) {
+      usbInit();
+    }
+    CCMessage(
+      channel:GlobalState.midiChannel,
+      controller:control,
+      value:val,
+    ).send();
+  }
+  static void sendMIDINoteOn(int sentNote, {bool isDrum = false}) async {
     if (!usbInititalized) {
       usbInit();
     }
     NoteOnMessage(
-        channel:GlobalState.midiChannel,
+        channel:isDrum?GlobalState.drumPadChannel:GlobalState.midiChannel,
         note:sentNote,
         velocity:GlobalState.noteVelocity,
     ).send();
   }
-  static void sendMIDINoteOff(int sentNote) async {
+  static void sendMIDINoteOff(int sentNote, {bool isDrum = false}) async {
     if (!usbInititalized) {
       usbInit();
     }
     NoteOffMessage(
-        channel:GlobalState.midiChannel,
+        channel:isDrum?GlobalState.drumPadChannel:GlobalState.midiChannel,
         note:sentNote,
         velocity:0,
     ).send();
   }
-  static void noteOn(int note){
+  static void noteOn(int note, {bool isDrum = false}){
     if (GlobalState.onboardSound == 1) {
       buildOnboardSound(note);
     } else {
-      sendMIDINoteOn(note);
+      sendMIDINoteOn(note, isDrum:isDrum);
     }
   }
-  static void noteOff(int note){
+  static void noteOff(int note, {bool isDrum = false}){
     if (GlobalState.onboardSound != 1) {
-      sendMIDINoteOff(note);
+      sendMIDINoteOff(note, isDrum:isDrum);
     }
   }
 }

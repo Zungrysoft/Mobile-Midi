@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mobile MIDI',
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/',

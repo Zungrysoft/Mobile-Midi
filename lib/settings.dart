@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   IconButton(
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(CupertinoIcons.refresh_circled),
                     onPressed: () {
                       Notes.usbInit();
                     },
@@ -106,29 +106,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     icon: const Icon(Icons.info),
                     onPressed: () {
                       GlobalState.infoText = descAutoChord;
-                      Navigator.pushNamed(context, '/info');
-                    },
-                  ),
-                ],
-              ),
-              Text(
-                "Glissando Restriction",
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ToggleSwitch(
-                    initialLabelIndex: GlobalState.glissandoRestrict,
-                    labels: ['All', 'White', 'Black'],
-                    onToggle: (index) {
-                      GlobalState.glissandoRestrict = index;
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.info),
-                    onPressed: () {
-                      GlobalState.infoText = descGlissandoRestrict;
                       Navigator.pushNamed(context, '/info');
                     },
                   ),
@@ -232,6 +209,34 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
               Text(
+                "Drum Pad MIDI Channel",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Slider(
+                    value: (GlobalState.drumPadChannel).toDouble()+1,
+                    min: 1,
+                    max: 16,
+                    divisions: 15,
+                    label: (GlobalState.drumPadChannel.round()+1).toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        GlobalState.drumPadChannel = value.toInt()-1;
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.info),
+                    onPressed: () {
+                      GlobalState.infoText = descDrumPadChannel;
+                      Navigator.pushNamed(context, '/info');
+                    },
+                  ),
+                ],
+              ),
+              Text(
                 "MIDI Note Velocity",
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
               ),
@@ -259,6 +264,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
+              Text(
+                "Controls Mode",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ToggleSwitch(
+                    initialLabelIndex: GlobalState.controlsMode,
+                    labels: ['1', '2', '3'],
+                    onToggle: (index) {
+                      GlobalState.controlsMode = index;
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.info),
+                    onPressed: () {
+                      GlobalState.infoText = descControlsMode;
+                      Navigator.pushNamed(context, '/info');
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -269,11 +297,12 @@ class _SettingsPageState extends State<SettingsPage> {
   String descSensitivity = "Lower sensitivity means you will need to tilt the device more to change notes.";
   String descNoteMode = "This setting decides what happens when you tap a new note while already holding a note with your other thumb.\n\nLegato: Switches to the new note.\n\nChord: Both notes will play together.\n\nAuto-Chord: Like Legato, but it play the selected chord instead.";
   String descAutoChord = "If you have Auto-Chord selected, this setting determines which chord is played.";
-  String descGlissandoRestrict = "Decides what notes glissandos will be restricted to.\n\nAll: Will play any note.\n\nWhite: Only plays white notes.\n\nBlack: Only plays black notes.";
   String descOnboardSound = "If enabled, the app will use simple onboard sound samples instead of a MIDI connection.";
   String descInterpolateNoteWheel = "If enabled, the Note Wheel will more smoothly transition between notes. However, this will effectively double the latency time on the gyro.";
   String descVibrationEnable = "If enabled, the device will vibrate whenever your selected note changes.";
-  String descMidiChannel = "Determines which channel the MIDI messages will be sent over. Your synthesizer will need to be configured to receive MIDI messages on this channel.";
+  String descMidiChannel = "Determines which channel the MIDI messages will be sent over for the note selector. Your synthesizer will need to be configured to receive MIDI messages on this channel.";
+  String descDrumPadChannel = "Determines which channel the MIDI messages will be sent over for the drum pads. Your synthesizer will need to be configured to receive MIDI messages on this channel.";
   String descNoteVelocity = "Determines what velocity the notes will be sent at. Higher velocity simulates hitting the keys harder on a piano.";
+  String descControlsMode = "Determines what controls will be available on the instrument screen.\n\nMode 1: Various MIDI CC controls.\n\nMode 2: Drum Pads\n\nMode 3: Settings";
 
 }
