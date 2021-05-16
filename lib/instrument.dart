@@ -103,6 +103,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
   int countmax = 60;
   List<int> heldNotes = [];
   bool steady = false;
+  int fingers = 0;
 
   String noteText(int n) {
     String builtNote = "";
@@ -195,6 +196,53 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
     });
   }
 
+  void notePressed(int n, bool gliss) {
+    fingers ++;
+    print("PRESSED");
+    //Legato Mode
+    if (GlobalState.noteMode == 0) {
+      //Turn off the previous note
+      if (heldNotes.length > 0) {
+        int stop = heldNotes[0];
+        Notes.noteOff(stop);
+        heldNotes.clear();
+      }
+
+      //Turn on the new note
+      Notes.noteOn(n);
+      heldNotes.add(n);
+    }
+    //Chord Mode
+    else {
+      //Turn on the new note
+      Notes.noteOn(n);
+      heldNotes.add(n);
+    }
+  }
+  void noteReleased(int n, bool gliss) {
+    print("RELEASED");
+    fingers --;
+    //Legato Mode
+    if (GlobalState.noteMode == 0) {
+      //If all fingers have been taken off, turn off all notes
+      if (fingers == 0 && heldNotes.length > 0) {
+        int stop = heldNotes[0];
+        Notes.noteOff(stop);
+        heldNotes.clear();
+      }
+    }
+    //Chord Mode
+    else {
+      //Turn off the last note in the list
+      if (heldNotes.length > 0) {
+        int stop = heldNotes[heldNotes.length-1];
+        Notes.noteOff(stop);
+        heldNotes.removeAt(heldNotes.length-1);
+      }
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     buildNotesChromatic();
@@ -241,15 +289,10 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
           children: <Widget>[
             Listener(
               onPointerDown: (details) {
-                int selected = globalPos~/noteWidth;
-                Notes.noteOn(selected);
-                heldNotes.add(selected);
+                notePressed(globalPos~/noteWidth, false);
               },
               onPointerUp: (details) {
-                for (int i = 0; i < heldNotes.length; i ++) {
-                  Notes.noteOff(heldNotes[i]);
-                }
-                heldNotes.clear();
+                noteReleased(globalPos~/noteWidth, false);
               },
               child: Container(
                 width:200,
