@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'global_state.dart';
+import 'notes.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -157,6 +158,28 @@ class _SettingsPageState extends State<SettingsPage> {
                     icon: const Icon(Icons.info),
                     onPressed: () {
                       GlobalState.infoText = descInterpolateNoteWheel;
+                      Navigator.pushNamed(context, '/info');
+                    },
+                  ),
+                ],
+              ),
+              Text(
+                "Refresh MIDI Connection",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () {
+                      Notes.usbInit();
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.info),
+                    onPressed: () {
+                      GlobalState.infoText = GlobalState.debugText;
                       Navigator.pushNamed(context, '/info');
                     },
                   ),

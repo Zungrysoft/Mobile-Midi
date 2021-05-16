@@ -59,7 +59,7 @@ class _DrumPadWidgetState extends State<DrumPadWidget> {
             Notes.noteOn(80);
           },
           onPointerUp: (details) {
-            Notes.noteOff(48);
+            Notes.noteOff(80);
           },
           child: Container(
             decoration: BoxDecoration(color: Colors.orange, border: Border.all()),
@@ -101,6 +101,8 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
   List<bool> notesColor = <bool>[];
   int counter = 0;
   int countmax = 60;
+  List<int> heldNotes = [];
+  bool steady = false;
 
   String noteText(int n) {
     String builtNote = "";
@@ -167,20 +169,15 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
           gyro_z = event.z;
 
           //Determine the notewheel's correct position
-          globalPos += gyro_z * noteWidth * GlobalState.sensitivity;
-          if (globalPos > noteWidth * notes.length) {
-            globalPos = noteWidth * notes.length;
+          if (!steady) {
+            globalPos += gyro_z * noteWidth * GlobalState.sensitivity;
+            if (globalPos > noteWidth * notes.length) {
+              globalPos = noteWidth * notes.length;
+            }
+            if (globalPos < 0) {
+              globalPos = 0;
+            }
           }
-          if (globalPos < 0) {
-            globalPos = 0;
-          }
-
-          /*counter += 1;
-          if (counter >= countmax) {
-            counter = 0;
-            DateTime now = DateTime.now();
-            print(now.difference(prev));
-          }*/
 
           //Handle the animation
           if (GlobalState.interpolateNoteWheel == 1) {
@@ -224,15 +221,42 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
           children: <Widget>[
             Listener(
               onPointerDown: (details) {
-                Notes.noteOn(globalPos~/noteWidth);
+                steady = true;
               },
               onPointerUp: (details) {
-                Notes.noteOff(48);
+                steady = false;
               },
               child: Container(
-                decoration: BoxDecoration(color: Colors.orange, border: Border.all()),
-                padding: EdgeInsets.all(16.0),
-                child: Text('DRUM'),
+                width:200,
+                height:70,
+                decoration: BoxDecoration(color: Colors.red, border: Border.all()),
+                padding: EdgeInsets.all(25),
+                child: Text('Steady'),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Listener(
+              onPointerDown: (details) {
+                int selected = globalPos~/noteWidth;
+                Notes.noteOn(selected);
+                heldNotes.add(selected);
+              },
+              onPointerUp: (details) {
+                for (int i = 0; i < heldNotes.length; i ++) {
+                  Notes.noteOff(heldNotes[i]);
+                }
+                heldNotes.clear();
+              },
+              child: Container(
+                width:200,
+                height:150,
+                decoration: BoxDecoration(color: Colors.yellow, border: Border.all()),
+                padding: EdgeInsets.all(25),
+                child: null,
               ),
             ),
           ],

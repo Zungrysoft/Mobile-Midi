@@ -5,5 +5,6 @@ class GlobalState {
   static int glissandoEnable = 0;
   static int glissandoRestrict = 0;
   static int onboardSound = 0;
-  static int interpolateNoteWheel = 0;
+  static int interpolateNoteWheel = 1;
+  static String debugText = "";
 }
