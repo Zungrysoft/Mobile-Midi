@@ -21,7 +21,7 @@ class _InstrumentPageState extends State<InstrumentPage> {
         ),
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               ElevatedButton(
                 child: Text('Settings'),
@@ -30,7 +30,10 @@ class _InstrumentPageState extends State<InstrumentPage> {
                 },
               ),
               DrumPadWidget(),
-              NoteWheelWidget(),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child:NoteWheelWidget(),
+              ),
             ],
           ),
         ));
@@ -103,7 +106,9 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
   int countmax = 60;
   List<int> heldNotes = [];
   bool steady = false;
+  bool glissando = false;
   int fingers = 0;
+  int prevNote = 0;
 
   String noteText(int n) {
     String builtNote = "";
@@ -180,6 +185,13 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
             }
           }
 
+          //Glissando
+          int curNote = selNote();
+          if (curNote != prevNote && glissando) {
+            noteGlissando(curNote);
+          }
+          prevNote = curNote;
+
           //Handle the animation
           if (GlobalState.interpolateNoteWheel == 1) {
             DateTime now = DateTime.now();
@@ -196,7 +208,11 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
     });
   }
 
-  void notePressed(int n, bool gliss) {
+  int selNote() {
+    return globalPos~/noteWidth;
+  }
+
+  void notePressed(int n) {
     fingers ++;
     print("PRESSED");
     //Legato Mode
@@ -243,7 +259,7 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
       heldNotes.add(n);
     }
   }
-  void noteReleased(int n, bool gliss) {
+  void noteReleased(int n) {
     print("RELEASED");
     fingers --;
     //Legato Mode
@@ -266,7 +282,20 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
         heldNotes.removeAt(heldNotes.length-1);
       }
     }
+  }
+  void noteGlissando(int n) {
+    //Clear all existing notes
+    for (int i = 0; i < heldNotes.length; i ++) {
+      int stop = heldNotes[i];
+      Notes.noteOff(stop);
+    }
+    heldNotes.clear();
 
+    //Turn on the new note
+    if (n != -1) {
+      Notes.noteOn(n);
+      heldNotes.add(n);
+    }
   }
 
   @override
@@ -301,11 +330,28 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
                 steady = false;
               },
               child: Container(
-                width:200,
-                height:70,
+                width:MediaQuery.of(context).size.width/2,
+                height:MediaQuery.of(context).size.height/10,
                 decoration: BoxDecoration(color: Colors.red, border: Border.all()),
                 padding: EdgeInsets.all(25),
                 child: Text('Steady'),
+              ),
+            ),
+            Listener(
+              onPointerDown: (details) {
+                glissando = true;
+                noteGlissando(selNote());
+              },
+              onPointerUp: (details) {
+                glissando = false;
+                noteGlissando(-1);
+              },
+              child: Container(
+                width:MediaQuery.of(context).size.width/2,
+                height:MediaQuery.of(context).size.height/10,
+                decoration: BoxDecoration(color: Colors.orange, border: Border.all()),
+                padding: EdgeInsets.all(25),
+                child: Text('Glissando'),
               ),
             ),
           ],
@@ -315,15 +361,15 @@ class _NoteWheelWidgetState extends State<NoteWheelWidget> {
           children: <Widget>[
             Listener(
               onPointerDown: (details) {
-                notePressed(globalPos~/noteWidth, false);
+                notePressed(selNote());
               },
               onPointerUp: (details) {
-                noteReleased(globalPos~/noteWidth, false);
+                noteReleased(selNote());
               },
               child: Container(
-                width:200,
-                height:150,
-                decoration: BoxDecoration(color: Colors.yellow, border: Border.all()),
+                width:MediaQuery.of(context).size.width,
+                height:MediaQuery.of(context).size.height/3,
+                decoration: BoxDecoration(color: Colors.blue[50], border: Border.all()),
                 padding: EdgeInsets.all(25),
                 child: null,
               ),
