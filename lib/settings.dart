@@ -295,7 +295,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   //All of this stuff is for the info menu that explains each setting
   String descSensitivity = "Lower sensitivity means you will need to tilt the device more to change notes.";
-  String descNoteMode = "This setting decides what happens when you tap a new note while already holding a note with your other thumb.\n\nLegato: Switches to the new note.\n\nChord: Both notes will play together.\n\nAuto-Chord: Like Legato, but it play the selected chord instead.";
+  String descNoteMode = "This setting decides what happens when you tap a new note while already holding a note with your other thumb.\n\nLegato: Switches to the new note.\n\nChord: Both notes will play together.\n\nAuto-Chord: Like Legato, but it plays the selected chord instead.";
   String descAutoChord = "If you have Auto-Chord selected, this setting determines which chord is played.";
   String descOnboardSound = "If enabled, the app will use simple onboard sound samples instead of a MIDI connection.";
   String descInterpolateNoteWheel = "If enabled, the Note Wheel will more smoothly transition between notes. However, this will effectively double the latency time on the gyro.";
