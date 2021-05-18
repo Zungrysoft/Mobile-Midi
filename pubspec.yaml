@@ -31,6 +31,7 @@ dependencies:
   sensors: ^2.0.0
   flutter_midi_command: ^0.3.7
   vibration: ^1.7.3
+  shared_preferences: ^2.0.5
 
 dev_dependencies:
   flutter_test:

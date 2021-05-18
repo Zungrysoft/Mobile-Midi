@@ -10,8 +10,18 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  void dispose() {
+    super.dispose();
+    GlobalState.save();
+  }
+  void initState() {
+    super.initState();
+    GlobalState.load();
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
@@ -21,21 +31,6 @@ class _SettingsPageState extends State<SettingsPage> {
         child: new SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              Text(
-                "Refresh MIDI Connection",
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  IconButton(
-                    icon: const Icon(CupertinoIcons.refresh_circled),
-                    onPressed: () {
-                      Notes.usbInit();
-                    },
-                  ),
-                ],
-              ),
               Text(
                 "Tilt Sensitivity",
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
@@ -181,90 +176,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
               Text(
-                "MIDI Channel",
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Slider(
-                    value: (GlobalState.midiChannel).toDouble()+1,
-                    min: 1,
-                    max: 16,
-                    divisions: 15,
-                    label: (GlobalState.midiChannel.round()+1).toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        GlobalState.midiChannel = value.toInt()-1;
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.info),
-                    onPressed: () {
-                      GlobalState.infoText = descMidiChannel;
-                      Navigator.pushNamed(context, '/info');
-                    },
-                  ),
-                ],
-              ),
-              Text(
-                "Drum Pad MIDI Channel",
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Slider(
-                    value: (GlobalState.drumPadChannel).toDouble()+1,
-                    min: 1,
-                    max: 16,
-                    divisions: 15,
-                    label: (GlobalState.drumPadChannel.round()+1).toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        GlobalState.drumPadChannel = value.toInt()-1;
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.info),
-                    onPressed: () {
-                      GlobalState.infoText = descDrumPadChannel;
-                      Navigator.pushNamed(context, '/info');
-                    },
-                  ),
-                ],
-              ),
-              Text(
-                "MIDI Note Velocity",
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Slider(
-                    value: GlobalState.noteVelocity.toDouble(),
-                    min: 1,
-                    max: 127,
-                    divisions: 125,
-                    label: GlobalState.noteVelocity.round().toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        GlobalState.noteVelocity = value.toInt();
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.info),
-                    onPressed: () {
-                      GlobalState.infoText = descNoteVelocity;
-                      Navigator.pushNamed(context, '/info');
-                    },
-                  ),
-                ],
-              ),
-              Text(
                 "Controls Mode",
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
               ),
@@ -287,6 +198,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
+              Text(
+                "MIDI Settings",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w900),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ElevatedButton(
+                    child: Text('MIDI Settings'),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/midi_settings');
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -300,9 +226,6 @@ class _SettingsPageState extends State<SettingsPage> {
   String descOnboardSound = "If enabled, the app will use simple onboard sound samples instead of a MIDI connection.";
   String descInterpolateNoteWheel = "If enabled, the Note Wheel will more smoothly transition between notes. However, this will effectively double the latency time on the gyro.";
   String descVibrationEnable = "If enabled, the device will vibrate whenever your selected note changes.";
-  String descMidiChannel = "Determines which channel the MIDI messages will be sent over for the note selector. Your synthesizer will need to be configured to receive MIDI messages on this channel.";
-  String descDrumPadChannel = "Determines which channel the MIDI messages will be sent over for the drum pads. Your synthesizer will need to be configured to receive MIDI messages on this channel.";
-  String descNoteVelocity = "Determines what velocity the notes will be sent at. Higher velocity simulates hitting the keys harder on a piano.";
   String descControlsMode = "Determines what controls will be available on the instrument screen.\n\nMode 1: Various MIDI CC controls.\n\nMode 2: Drum Pads\n\nMode 3: Settings";
 
 }
