@@ -1,10 +1,11 @@
 import 'global_state.dart';
-import 'package:soundpool/soundpool.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_usb_write/flutter_usb_write.dart';
 import 'package:flutter/services.dart';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:flutter_midi_command/flutter_midi_command.dart';
+import 'package:flutter_midi_command/flutter_midi_command_messages.dart';
+import 'package:soundpool/soundpool.dart';
 
 class Notes {
   static Soundpool pool = Soundpool(maxStreams: 30);
@@ -33,57 +34,87 @@ class Notes {
     if (note == 11) {builtNote = "b";}
     if (octave <= 3) {builtNote += "3";}
     if (octave == 4) {builtNote += "4";}
-    if (octave >= 5) {builtNote += "5";}
-    if (octave >= 6 && note == 0) {builtNote += "6";}
-    playOnboardSound(builtNote);
-  }
-  static bool usbInititalized = false;
-  static FlutterUsbWrite _flutterUsbWrite = FlutterUsbWrite();
-  static StreamSubscription<UsbEvent> _usbStateSubscription;
-  static Future<UsbDevice> _connect(UsbDevice device) async {
-    try {
-      var result = await _flutterUsbWrite.open(
-        vendorId: device.vid,
-        productId: device.pid,
-      );
-      return result;
-    } on PermissionException {
-      print("Not allowed to do that");
-      return null;
-    } on PlatformException catch (e) {
-      print(e.message);
-      return null;
-    }
-  }
-  static void usbInit() async {
-    if (usbInititalized == false) {
-      List<UsbDevice> devices;
-      try {
-        devices = await _flutterUsbWrite.listDevices();
-        _connect(devices[0]);
-      } on PlatformException catch (e) {
-        print(e.message);
+    if (octave >= 5) {
+      if (note == 9 || note == 10 || note == 11) {
+        builtNote += "4";
+      } else {
+        builtNote += "5";
       }
     }
-    usbInititalized = false;
+    playOnboardSound(builtNote);
   }
-  static void sendMIDINoteOn(int note) async {
-    usbInit();
-    List<int> data = [144,62,127];
-    print(Uint8List.fromList(data));
-    bool result = await _flutterUsbWrite.write(Uint8List.fromList(data));
-    if (result == false) {
-      print("FAILED TO WRITE");
+  static MidiCommand _midiCommand = MidiCommand();
+  static bool usbInititalized = false;
+  static List<MidiDevice> devices;
+  static void processDevices(value) {
+    //Update the global variables
+    devices = value;
+    print("There are " + devices.length.toString() + " devices available");
+
+    //Connect to each device
+    GlobalState.debugText = "";
+    for (int i = 0; i < devices.length; i ++) {
+      _midiCommand.connectToDevice(devices[i]);
+      if (devices[i].connected) {
+        //Debug
+        GlobalState.debugText += "Connected to " + devices[i].name + "\n";
+        print("Connected to " + devices[i].name + "\n");
+
+        //Connect to Ports
+        List<MidiPort> inPorts = devices[i].inputPorts;
+        List<MidiPort> outPorts = devices[i].outputPorts;
+        GlobalState.debugText += "  Input Ports: " + inPorts.length.toString() + "\n";
+        GlobalState.debugText += "  Output Ports: " + outPorts.length.toString() + "\n";
+      }
     }
   }
-  static void noteOn(int note){
+
+  static void usbInit() async {
+    _midiCommand.teardown();
+    usbInititalized = true;
+    final deviceFuture = _midiCommand.devices;
+    deviceFuture.then((value) => processDevices(value));
+  }
+  static void sendMIDICC(int control, int val) async {
+    if (!usbInititalized) {
+      usbInit();
+    }
+    CCMessage(
+      channel:GlobalState.midiChannel,
+      controller:control,
+      value:val,
+    ).send();
+  }
+  static void sendMIDINoteOn(int sentNote, {bool isDrum = false}) async {
+    if (!usbInititalized) {
+      usbInit();
+    }
+    NoteOnMessage(
+        channel:isDrum?GlobalState.drumPadChannel:GlobalState.midiChannel,
+        note:sentNote,
+        velocity:GlobalState.noteVelocity,
+    ).send();
+  }
+  static void sendMIDINoteOff(int sentNote, {bool isDrum = false}) async {
+    if (!usbInititalized) {
+      usbInit();
+    }
+    NoteOffMessage(
+        channel:isDrum?GlobalState.drumPadChannel:GlobalState.midiChannel,
+        note:sentNote,
+        velocity:0,
+    ).send();
+  }
+  static void noteOn(int note, {bool isDrum = false}){
     if (GlobalState.onboardSound == 1) {
       buildOnboardSound(note);
     } else {
-      sendMIDINoteOn(note);
+      sendMIDINoteOn(note, isDrum:isDrum);
     }
   }
-  static void noteOff(int note){
-    print("off");
+  static void noteOff(int note, {bool isDrum = false}){
+    if (GlobalState.onboardSound != 1) {
+      sendMIDINoteOff(note, isDrum:isDrum);
+    }
   }
 }

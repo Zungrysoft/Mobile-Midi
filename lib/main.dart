@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'instrument.dart';
 import 'settings.dart';
+import 'midi_settings.dart';
 import 'info.dart';
 import 'global_state.dart';
 
@@ -15,7 +16,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mobile MIDI',
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/',
@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/instrument': (context) => InstrumentPage(),
         '/settings': (context) => SettingsPage(),
+        '/midi_settings': (context) => MidiSettingsPage(),
         '/info': (context) => InfoPage(),
       },
     );
